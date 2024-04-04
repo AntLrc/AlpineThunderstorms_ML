@@ -4,8 +4,7 @@ import matplotlib.pyplot as plt
 import xarray as xr
 import h5py
 
-# path = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/severe_storms_2016-2021/CH_severe_storms_2016_2021.csv"
-path = "/home/antoine/Documents/Travail/UNIL/Preparation/Bibliographie préparatoire/Nature article + dataset/CH_severe_storms_2016_2021.csv"
+path = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/severe_storms_2016-2021/CH_severe_storms_2016_2021.csv"
 
 df = pd.read_csv(path, sep = ';')
 

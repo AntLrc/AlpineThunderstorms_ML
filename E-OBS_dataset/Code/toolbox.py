@@ -63,10 +63,13 @@ def plotter(data, date, zone = "E", path_to_folder = "/work/FAC/FGSE/IDYST/tbeuc
         dir to which data should be saved, by default "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/repos/E-OBS_dataset/Results"
     """
     da = extractor(data, date, zone = zone)
+    data_crs = ccrs.PlateCarree()
     ax = plt.subplot(projection = ccrs.PlateCarree())
-    da.plot()
-    ax.add_feature(cfeature.BORDERS, linewidth = 1)
-    ax.add_feature(cfeature.COASTLINE, linewidth = 1)
+    da.plot(transform = data_crs)
+    if zone == "S":
+        ax.add_feature(cfeature.BORDERS)
+        ax.add_feature(cfeature.LAKES)
+    ax.add_feature(cfeature.COASTLINE.with_scale('50m'))
     plt.show()
     try:
         plt.savefig(path_to_folder + '/' + date + "_" + data + "_" + zone + ".png")

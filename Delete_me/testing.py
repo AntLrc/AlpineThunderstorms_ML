@@ -2,13 +2,13 @@ import pandas as pd
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
+import geopandas as gpd
 
-path_to_file = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/E-OBS_0.1-deg/RR/rr_ens_mean_0.1deg_reg_2011-2023_v29.0e.nc"
+df1 = pd.read_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/severe_storms_2016-2021/CH_severe_storms_2016_2021.csv", sep = ';', dtype={'ID':'string', 'chx':'string', 'chy':'string', 'time':'string'})
+df = df1[["ID", "time"]]
 
-da = xr.open_dataarray(path_to_file)
+gdf = gpd.GeoDataFrame(df, geometry = gpd.points_from_xy(df1.chx,df1.chy), crs = "EPSG:2056")
 
-da.sel(time = "2019-08-01").plot()
-plt.show()
-plt.savefig("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/repos/E-OBS_dataset/Results/rr_ens_mean_0.1deg_reg_2011-2023_v29.0e.png")
+gdf_wgs = gdf.to_crs("EPSG:4326")
 
-print("ok")
+print(gdf_wgs)

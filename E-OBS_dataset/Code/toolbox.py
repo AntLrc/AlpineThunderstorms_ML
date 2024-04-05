@@ -6,6 +6,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import xarray as xr
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
 path_to_data = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/E-OBS_0.1-deg"
 
@@ -61,13 +63,17 @@ def plotter(data, date, zone = "E", path_to_folder = "/work/FAC/FGSE/IDYST/tbeuc
         dir to which data should be saved, by default "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/repos/E-OBS_dataset/Results"
     """
     da = extractor(data, date, zone = zone)
+    ax = plt.subplot(projection = ccrs.PlateCarree())
     da.plot()
+    ax.add_feature(cfeature.BORDERS, linewidth = 1)
+    ax.add_feature(cfeature.COASTLINE, linewidth = 1)
     plt.show()
     try:
         plt.savefig(path_to_folder + '/' + date + "_" + data + "_" + zone + ".png")
     except:
         raise ValueError("path_to_folder should be formatted as path/to/folder")
-    return    
+    plt.close()
+    return
 
 
 

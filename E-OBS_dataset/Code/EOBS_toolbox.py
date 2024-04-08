@@ -87,22 +87,32 @@ def plotter(data, date, zone = "E", path_to_folder = "/work/FAC/FGSE/IDYST/tbeuc
     plt.close()
     return
 
-def plotter_with_storms(data, date, zone = "E", path_to_folder = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/plots/E-OBS_dataset", legend = False):
+def plotter_with_storms(data, date, zone="E", path_to_folder="/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/plots/E-OBS_dataset", legend=False):
     """
     Plot data from the E-OBS dataset with storm positions.
+
+    Parameters:
+    - data (str): The name of the dataset.
+    - date (str): The date of the data to be plotted.
+    - zone (str, optional): The zone to be plotted. Defaults to "E".
+    - path_to_folder (str, optional): The path to the folder where the plot will be saved. Defaults to "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/plots/E-OBS_dataset".
+    - legend (bool, optional): Whether to show the legend on the plot. Defaults to False.
+
+    Returns:
+    - None
     """
     storms = extract_date(date)
-    da = extractor(data, date, zone = zone)
+    da = extractor(data, date, zone=zone)
     data_crs = ccrs.PlateCarree()
-    ax = plt.subplot(projection = ccrs.PlateCarree())
-    da.plot(transform = data_crs)
+    ax = plt.subplot(projection=ccrs.PlateCarree())
+    da.plot(transform=data_crs)
     if zone == "S":
         ax.add_feature(cfeature.BORDERS)
         ax.add_feature(cfeature.LAKES)
     ax.add_feature(cfeature.COASTLINE.with_scale('50m'))
     for name, group in storms:
-        plt.plot(group["longitude"], group["latitude"], transform = ccrs.PlateCarree(), label = name)
-        
+        plt.plot(group["longitude"], group["latitude"], transform=ccrs.PlateCarree(), label=name)
+
     if legend:
         plt.legend()
     plt.show()

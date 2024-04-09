@@ -1,3 +1,5 @@
+#%%
+
 """
 Toolbox to work with E-OBS dataset. Plotter, extractor available.
 """
@@ -123,7 +125,10 @@ def plotter_with_storms(data, date, zone="E", path_to_folder="/work/FAC/FGSE/IDY
     plt.close()
     return
 
+
     
 
 
 
+
+# %%

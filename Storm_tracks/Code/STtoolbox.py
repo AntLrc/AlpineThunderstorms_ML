@@ -55,5 +55,5 @@ def extract_date(date):
     
     return storms1
 
-to_WGS()
+
 

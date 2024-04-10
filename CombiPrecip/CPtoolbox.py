@@ -173,8 +173,4 @@ print("CPtoolbox.py loaded successfully")
 
 #%% Tests
 
-ds = xr.open_dataset("/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/CombiPrecip/2024/202401/CPC_00060_H_20240115000000_20240121230000.nc")
-ds_date = get_precip("2024-01-01 00")
-plot_precip(ds_date)
 
-# %%

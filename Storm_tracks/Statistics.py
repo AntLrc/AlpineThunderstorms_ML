@@ -131,4 +131,104 @@ def track_length_plot(storms = sttb.get_storms_tracks(), path_to_folder = "/work
     plt.close()
     return
 
+def storm_statistics_day(mult, plottype = "hist"):
+    """
+    Plot the distribution of storms on a day.
+    
+    Parameters
+    ----------
+    mult : str
+        Method for multiple plots.
+    plottype : str
+        Type of plot to use.
+    
+    Returns
+    -------
+    None
+    """
+    sns.set_theme()
+    
+    fig, axes = plt.subplots(nrows = 5, ncols = 1, figsize = (15, 20), sharex = True)
+    storms = pd.read_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/Storm_tracks/CH_severe_storms_2016_2021.csv", parse_dates=["time"])
+    
+    plt.tight_layout()
+    
+    # Plotting distribution on a day
+    storms["MoD"] = storms["time"].dt.hour*60 + storms["time"].dt.minute
+    sns.histplot(storms["MoD"], bins = 12*24, ax=axes[0])
+    # Getting all hour - 5min in a day
+    xlab = pd.date_range(start='2016-01-01', periods = 24, freq='2h')
+    axes[0].set_xticks(xlab.hour*60 + xlab.minute, xlab.strftime("%H:%M"))
+    axes[0].set_xlabel("Time of the day")
+    axes[0].set_xlim(0, 24*60)
+    axes[0].set_ylabel("Number of storms")
+    
+    # Plotting distribution on a day per month
+    three_months = [[],
+                    ["January", "February", "March"],
+                    ["April", "May", "June"],
+                    ["July", "August", "September"],
+                    ["October", "November", "December"]]
+    for i in range(1, 5):
+        storms["MoD"] = storms["time"].dt.hour*60 + storms["time"].dt.minute
+        storms["Month"] = storms["time"].dt.month_name()
+        if not (storms[storms["Month"].isin(three_months[i])].empty):
+            if plottype == "hist":
+                sns.histplot(data = storms[storms["Month"].isin(three_months[i])],
+                             x="MoD", bins = 12*24,
+                             ax=axes[i],
+                             hue = "Month",
+                             multiple=mult)
+                axes[i].set_ylim(0,700)
+            elif plottype == "kde":
+                sns.kdeplot(data = storms[storms["Month"].isin(three_months[i])],
+                            x="MoD",
+                            ax=axes[i],
+                            hue = "Month",
+                            multiple=mult)
+        # Getting all hour - 5min in a day
+        xlab = pd.date_range(start='2016-01-01', periods = 24, freq='2h')
+        axes[i].set_xticks(xlab.hour*60 + xlab.minute, xlab.strftime("%H:%M"))
+        axes[i].set_xlim(0, 24*60)
+        axes[i].set_ylabel("Number of storms")
+    
+    axes[-1].set_xlabel("Time of the day")
+    fig.suptitle("Distribution of storms on a day")
+    
+    
+    
+    plt.show()
+    plt.close()
+    
+    
+    
+    return
+
+def storm_statistics_year():
+    """
+    Plot the distribution of storms on a year.
+    
+    Returns
+    -------
+    None
+    """
+    sns.set_theme()
+    
+    fig, axes = plt.subplots(nrows = 1, ncols = 1, figsize = (15, 5), sharex=True)
+    storms = pd.read_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/Storm_tracks/CH_severe_storms_2016_2021.csv", parse_dates=["time"])
+    
+    plt.tight_layout()
+    
+    # Plotting distribution on a year
+    storms["MonthDay"] = storms["time"].dt.dayofyear
+    
+    sns.histplot(storms["MonthDay"], bins = np.arange(366), ax=axes)
+    
+    xlab = pd.date_range(start='2016-01-01', periods = 12, freq='MS')
+    axes.set_xticks(xlab.dayofyear, xlab.strftime("%m-%d"))
+    axes.set_xlabel("Date")
+    axes.set_xlim(0, 365)
+    axes.set_ylabel("Number of storms")
+    axes.set_title("Distribution of storms on a year")
+
 # %%

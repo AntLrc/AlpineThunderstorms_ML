@@ -18,6 +18,9 @@ import STtoolbox as sttb
 
 sns.set_theme()
 
+def test():
+    print("Hello world!")
+
 def get_wind_gust(stations = slftb.get_stations(),
                    sampling = True,
                    samplesize = 100,
@@ -169,7 +172,11 @@ def get_storms_gust(storms = sttb.get_storms(),
     return data
 
 
-def plotter(save = False, filename = "all_storms_gust_distribution.png", breakafter = 100):
+def plotter(save = False,
+            filename = "all_storms_gust_distribution.png",
+            breakafter = 100,
+            savedata = False,
+            dataname = "data_gust.pkl"):
     """
     Plot the distributions of wind gust during severe storms.
     
@@ -210,7 +217,7 @@ def plotter(save = False, filename = "all_storms_gust_distribution.png", breakaf
     plt.show()
     plt.close()
     return data
-    
+
 
 # %%
 

@@ -1,6 +1,7 @@
 #%%
 
 import pandas as pd
+import numpy as np
 import geopandas as gpd
 import xarray as xr
 import pickle
@@ -181,7 +182,19 @@ def get_storms_tracks(path = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1
         gdf = pickle.load(f)
     return gdf
 
-
+def needed_times(dated_storms = pd.read_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/Storm_tracks/CH_severe_storms_2016_2021.csv", parse_dates=["time"]),
+                 lead_times = [pd.Timedelta(hours = i) for i in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,21,24,30,36,48,72]],
+                 ):
+    res1 = dated_storms["time"][dated_storms["time"].dt.minute == 0].unique()
+    for dtimes in lead_times:
+        res1 = np.concatenate((res1, res1 - dtimes))
+    res1 = np.unique(res1).sort()
+    
+    with open("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/ERA5/needed_times.pkl", 'wb') as f:
+        pickle.dump(res1, f)
+    return res1
+    
+    
 
     
 

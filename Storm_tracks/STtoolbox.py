@@ -183,7 +183,7 @@ def get_storms_tracks(path = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1
     return gdf
 
 def needed_times(dated_storms = pd.read_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/Storm_tracks/CH_severe_storms_2016_2021.csv", parse_dates=["time"]),
-                 lead_times = [pd.Timedelta(hours = i) for i in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,21,24,30,36,48,72]],
+                 lead_times = [pd.Timedelta(hours = i) for i in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,27,30,33,36,42,48,60,72]],
                  ):
     res1 = dated_storms["time"][dated_storms["time"].dt.minute == 0].unique()
     for dtimes in lead_times:

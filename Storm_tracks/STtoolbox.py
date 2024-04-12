@@ -30,9 +30,20 @@ def to_WGS():
     res = df.drop(["chx", "chy", "Unnamed: 0"], axis=1)
     res["longitude"] = wgsx
     res["latitude"] = wgsy
-    res["time"] = df["time"].apply(lambda x : x[0:4] + '-' + x[4:6] + '-' + x[6:8] + 'T' + x[8:10] + ':' + x[10:12]+":00")
+    res["time"] = df["time"].apply(lambda x : x[0:4] + '-' + x[4:6] + '-' + x[6:8] + 'T' + x[8:10] + ':' + x[10:12]+":00+00:00")
 
     res.to_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/Storm_tracks/CH_severe_storms_2016_2021_WGS84.csv", index = False)
+
+def to_datetime():
+    """
+    Convert the date and time of severe storms to a datetime object.
+    
+    This function reads a CSV file containing severe storm data with a date and time column, and converts the date and time to a datetime object.
+    """
+    path = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/severe_storms_2016-2021/CH_severe_storms_2016_2021.csv"
+    df = pd.read_csv(path, sep = ";", dtype=str, index_col=False)
+    df["time"] = df["time"].apply(lambda x : x[0:4] + '-' + x[4:6] + '-' + x[6:8] + 'T' + x[8:10] + ':' + x[10:12]+":00+00:00")
+    df.to_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/Storm_tracks/CH_severe_storms_2016_2021.csv", index = False)
 
 def extract_date(date):
     """
@@ -169,6 +180,8 @@ def get_storms_tracks(path = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1
     with open(path, 'rb') as f:
         gdf = pickle.load(f)
     return gdf
+
+
 
     
 

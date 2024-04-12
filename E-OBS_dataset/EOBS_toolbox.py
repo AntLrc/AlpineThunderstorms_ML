@@ -12,7 +12,7 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
 import sys
-sys.path.append("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/repos/Storm_tracks/Code")
+sys.path.append("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/repos/Storm_tracks")
 
 from STtoolbox import extract_date
 

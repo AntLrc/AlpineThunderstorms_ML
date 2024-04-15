@@ -188,11 +188,19 @@ def needed_times(dated_storms = pd.read_csv("/work/FAC/FGSE/IDYST/tbeucler/downs
     res1 = dated_storms["time"][dated_storms["time"].dt.minute == 0].unique()
     for dtimes in lead_times:
         res1 = np.concatenate((res1, res1 - dtimes))
-    res1 = np.unique(res1).sort()
+        res1 = np.unique(res1)
+    res1 = np.sort(res1)
+    res1 = pd.Series(res1)
     
+    res = pd.DataFrame(
+                {'surface_variables':[['mean_sea_level_pressure', '10m_u_component_of_wind', '10m_v_component_of_wind', '2m_temperature']]*len(res1),
+                  'pressure_variables':[['geopotential', 'specific_humidity', 'temperature', 'u_component_of_wind', 'v_component_of_wind']]*len(res1),
+                  },
+                index = res1
+                 )
     with open("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/ERA5/needed_times.pkl", 'wb') as f:
-        pickle.dump(res1, f)
-    return res1
+        pickle.dump(res, f)
+    return res
     
     
 

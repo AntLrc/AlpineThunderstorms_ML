@@ -35,7 +35,7 @@ folder_path = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/AI-models-inpu
     
 parser = argparse.ArgumentParser(description="Download ERA5 data")
 
-parser.add_argument("--dates", type=str,
+parser.add_argument("--dates", type=str, default = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/ERA5/needed_times.pkl",
                     help="Dates to download, stored in a pkl file containing a DataFrame indexed by timestamp.")
 parser.add_argument("--var_type", action=CustomAction, type=str,
                     help="Type of variable to download. Use 'surface' or 'pressure'.")
@@ -70,8 +70,7 @@ c = cdsapi.Client()
 dates_gr = dates.groupby(dates.index.date)
 
 for date, group in dates_gr:
-    try:
-        print("Downloading " + date.strftime("%Y-%m-%d") + "...")    
+    try:  
         year, month, day = date.strftime("%Y"), date.strftime("%m"), date.strftime("%d")
         if year_pars:
             if year != year_pars:
@@ -84,6 +83,7 @@ for date, group in dates_gr:
         if args.max_day and day > args.max_day:
             continue
         
+        print("Downloading " + date.strftime("%Y-%m-%d") + "...")  
         date = date.strftime("%Y-%m-%d")
         hours = list(group.index.strftime("%H:%M"))
         variables = group[folder].iloc[0]

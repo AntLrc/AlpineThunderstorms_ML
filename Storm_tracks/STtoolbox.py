@@ -6,6 +6,7 @@ import geopandas as gpd
 import xarray as xr
 import pickle
 from shapely.geometry import Point, LineString
+from collections import defaultdict
 
 
 def to_WGS():
@@ -181,28 +182,30 @@ def get_storms_tracks(path = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1
     with open(path, 'rb') as f:
         gdf = pickle.load(f)
     return gdf
-
-def needed_times(dated_storms = pd.read_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/Storm_tracks/CH_severe_storms_2016_2021.csv", parse_dates=["time"]),
+    
+def needed_times_LT(dated_storms = pd.read_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/Storm_tracks/CH_severe_storms_2016_2021.csv", parse_dates=["time"]),
                  lead_times = [pd.Timedelta(hours = i) for i in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,27,30,33,36,42,48,60,72]],
                  ):
-    res1 = dated_storms["time"][dated_storms["time"].dt.minute == 0].unique()
-    for dtimes in lead_times:
-        res1 = np.concatenate((res1, res1 - dtimes))
-        res1 = np.unique(res1)
-    res1 = np.sort(res1)
-    res1 = pd.Series(res1)
+    col = np.sort(dated_storms["time"][dated_storms["time"].dt.minute == 0].unique())
+    true_col = [True]*len(col)
+    res = pd.DataFrame(columns=['time'], dtype = 'datetime64[ns]')
+    res.set_index('time', inplace=True)
     
-    res = pd.DataFrame(
-                {'surface_variables':[['mean_sea_level_pressure', '10m_u_component_of_wind', '10m_v_component_of_wind', '2m_temperature']]*len(res1),
-                  'pressure_variables':[['geopotential', 'specific_humidity', 'temperature', 'u_component_of_wind', 'v_component_of_wind']]*len(res1),
-                  },
-                index = res1
-                 )
-    with open("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/ERA5/needed_times.pkl", 'wb') as f:
+    for lead_time in lead_times:
+        to_add = pd.DataFrame({"time":col - lead_time, lead_time:true_col})
+        to_add.set_index('time', inplace=True)
+        res = pd.concat([res, to_add], axis = 1)
+    
+    res = res.replace({np.nan: False})
+    
+    with open("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/ERA5/needed_times_LT.pkl", 'wb') as f:
         pickle.dump(res, f)
+    
+    pd.Series(np.array(res.index)).to_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/ERA5/needed_times_LT.csv", index = False, header=False)
+    
     return res
     
-    
+        
 
     
 

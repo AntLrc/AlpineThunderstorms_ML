@@ -11,90 +11,108 @@ import argparse
 import pandas as pd
 import subprocess
 import numpy as np
-
-class CustomAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        if values.lower() == 'surface':
-            setattr(namespace,
-                    self.dest,
-                    ('reanalysis-era5-single-levels',
-                     'surface_variables',
-                     )
-                    )
-        elif values.lower() == 'pressure':
-            setattr(namespace,
-                    self.dest,
-                    ('reanalysis-era5-pressure-levels',
-                     'pressure_variables'
-                     )
-                    )
-        else:
-            parser.error("Invalid value for --var-type argument. Use 'surface' or 'pressure'.")
-
-folder_path = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/AI-models-input"
+import os
     
 parser = argparse.ArgumentParser(description="Download ERA5 data")
 
-parser.add_argument("--dates", type=str, default = "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/ERA5/needed_times.pkl",
-                    help="Dates to download, stored in a pkl file containing a DataFrame indexed by timestamp.")
-parser.add_argument("--var_type", action=CustomAction, type=str,
-                    help="Type of variable to download. Use 'surface' or 'pressure'.")
-parser.add_argument("--year", type=str, default=False,
-                    help = "Year to download.")
-parser.add_argument("--month", type=str, default=False,
-                    help = "Month to download.")
-parser.add_argument("--min_day", type=str, default=False,
-                    help = "Minimum day to download.")
-parser.add_argument("--max_day", type=str, default=False,
-                    help = "Maximum day to download.")
+parser.add_argument("--output", "-o",
+                    type=str,
+                    default="/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/AI-models-input",
+                    help="Path to the output folder.")
+
+parser.add_argument("--from-file",
+                    action="store_true",
+                    help="Dates to download, stored in a csv file.")
+
+parser.add_argument("--path",
+                    type=str,
+                    default="/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/treated_data/ERA5/needed_times_LT.csv",
+                    help="Path to the csv file containing the dates to download.")
+
+parser.add_argument("--surface","-s",
+                    action="store_true",
+                    help="Downloading only surface field if present.")
+
+parser.add_argument("--pressure","-p",
+                    action="store_true",
+                    help="Downloading only pressure-dependant field if present.")
+
+parser.add_argument("--date",
+                    type=str,
+                    default=False,
+                    help = "Date to download, format YYYY or YYYYMM or YYYYMMDD")
+
+parser.add_argument("--time",
+                    type=str,
+                    default=False,
+                    help = "Hour to download, format HH")
 
 args = parser.parse_args()
 
-dates_file = args.dates
-with open(dates_file, 'rb') as f:
-    dates = pickle.load(f)
-    
-with open("/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/AI-models-input/whatwhen.pkl", 'rb') as f:
-    whenwhat = pickle.load(f)
-    
-data_origin, folder = args.var_type
-year_pars = args.year
-month_pars = args.month
+folder_path =  args.output
 
-target_folder = folder_path + "/" + folder + "/"
+# Choose what dates to download depending on parsed arguments.
+if args.from_file:
+    dates1 = pd.read_csv(args.path, header = None, index_col=0, parse_dates=True).index
 
-print("Downloading " + folder + "...")
+
+if args.date:
+    year = args.date[:4]
+    if len(args.date) == 4:
+        if args.time:
+            dates = pd.date_range(start = year + "-01-01 " + args.time + ":00", end = year + "-12-31 " + args.time + ":00", freq = "h")
+        else:
+            dates = pd.date_range(start = year + "-01-01 00:00", end = year + "-12-31 23:00", freq = "h")
+            
+    elif len(args.date) == 6:
+        month = args.date[4:]
+        if args.time:
+            dates = pd.date_range(start = year + "-" + month + "-01 " + args.time + ":00", end = year + "-" + month + "-31 " + args.time + ":00", freq = "h")
+        else:
+            dates = pd.date_range(start = year + "-" + month + "-01 00:00", end = year + "-" + month + "-31 23:00", freq = "h")
+            
+    elif len(args.date) == 8:
+        month = args.date[4:6]
+        day = args.date[6:]
+        if args.time:
+            dates = pd.date_range(start = year + "-" + month + "-" + day + " " + args.time + ":00", end = year + "-" + month + "-" + day + " " + args.time + ":00", freq = "h")
+        else:
+            dates = pd.date_range(start = year + "-" + month + "-" + day + " 00:00", end = year + "-" + month + "-" + day + " 23:00", freq = "h")
+    
+    else:
+        raise ValueError("Date format not recognized.")
+    
+else:
+    if dates1.
+    dates = pd.date_range(start = (pd.Timestamp.today() - pd.Timedelta(hours = 24)).strftime("%Y-%m-%d %H"), end = pd.Timestamp.today(), freq = "H")
+    
+# Load the dates already downloaded.    
+when = pd.read_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/AI-models-input/when.csv", header = None, index_col=0, parse_dates=True).index
+
+
+datas = [('reanalysis-era5-single-levels', "surface_variables", ['mean_sea_level_pressure', '10m_u_component_of_wind', '10m_v_component_of_wind', '2m_temperature'])]*(args.surface or not(args.surface or args.pressure)) +\
+    [('reanalysis-era5-pressure-levels', "pressure_variables", ['geopotential', 'specific_humidity', 'temperature', 'u_component_of_wind', 'v_component_of_wind'])]*(args.pressure or not(args.surface or args.pressure))
 
 c = cdsapi.Client()
 
-dates_gr = dates.groupby(dates.index.date)
+dates_gr = dates.groupby(dates.date)
 
-for date, group in dates_gr:
-    try:  
-        year, month, day = date.strftime("%Y"), date.strftime("%m"), date.strftime("%d")
-        if year_pars:
-            if year != year_pars:
-                continue
-        if month_pars:
-            if month != month_pars:
-                continue
-        if args.min_day and day < args.min_day:
-            continue
-        if args.max_day and day > args.max_day:
-            continue
+for date in dates_gr:
+    group = dates_gr[date]
+    """
+    try:
+    """  
+    year, month, day = date.strftime("%Y"), date.strftime("%m"), date.strftime("%d")
+    
+    print("\nDownloading " + date.strftime("%Y-%m-%d") + "...")  
+    date = date.strftime("%Y-%m-%d")
+    hours = list(group.strftime("%H:%M"))
+    
+    
+    for data_origin, variable, variables in datas:
+        subprocess.run(["mkdir", "-p", os.path.join(folder_path, variable, year, month)])
         
-        print("Downloading " + date.strftime("%Y-%m-%d") + "...")  
-        date = date.strftime("%Y-%m-%d")
-        hours = list(group.index.strftime("%H:%M"))
-        variables = group[folder].iloc[0]
-        subprocess.run(["mkdir", "-p", target_folder + year + "/" + month])
-        
-        
-        
-        
-        c.retrieve(
-        data_origin,
-        {
+        variables_to_download = {
             'product_type': 'reanalysis',
             'format': 'grib',
             'variable': variables,
@@ -102,18 +120,23 @@ for date, group in dates_gr:
             'month': month,
             'day': day,
             'time': hours,
-        },
-        target=target_folder + year + "/" + month + "/" + date + "_ERA5.grib"
-        )
+        }
+        variables_to_download.update(({'pressure_level': ['1000', '925', '850', '700', '600', '500', '400', '300', '250', '200', '150', '100', '50']} if variable == "pressure_variables" else {}))
         
-        whenwhat = pd.concat([whenwhat, group])
+        c.retrieve(
+        data_origin,
+        variables_to_download,
+        target=os.path.join(folder_path, variable, year, month, date + "_ERA5.grib")
+        )
     
+    when = np.sort(np.unique(np.concatenate([when, group])))
+    """
     except:
         print("Error downloading " + str(date) + ".")
         with open("/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/repos/Scripts/Outputs/failed.txt", 'a') as file:
             file.write(str(date) + "\n")
+    """
 
-with open("/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/AI-models-input/whatwhen.pkl", 'wb') as f:
-    pickle.dump(whenwhat, f)
+pd.Series(when).to_csv("/work/FAC/FGSE/IDYST/tbeucler/downscaling/raw_data/AI-models-input/when.csv", index = False, header=False)
 
       

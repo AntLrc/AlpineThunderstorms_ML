@@ -1,2 +1,0 @@
-/var/spool/slurm/d/job41739247/slurm_script: line 33: 698102 Killed                  python3 /work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/repos/Scripts/runner.py --module-path "$pathmod" --module-name "$pythonmod" --function-name "$pythonfunc"
-slurmstepd: error: Detected 1 oom-kill event(s) in StepId=41739247.batch. Some of your processes may have been killed by the cgroup out-of-memory handler.

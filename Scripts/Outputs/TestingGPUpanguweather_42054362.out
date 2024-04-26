@@ -1,56 +1,0 @@
-Tue Apr 16 23:04:20 2024       
-+---------------------------------------------------------------------------------------+
-| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 12.2     |
-|-----------------------------------------+----------------------+----------------------+
-| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
-|                                         |                      |               MIG M. |
-|=========================================+======================+======================|
-|   0  NVIDIA A100-PCIE-40GB          On  | 00000000:21:00.0 Off |                    0 |
-| N/A   29C    P0              36W / 250W |      4MiB / 40960MiB |      0%      Default |
-|                                         |                      |             Disabled |
-+-----------------------------------------+----------------------+----------------------+
-                                                                                         
-+---------------------------------------------------------------------------------------+
-| Processes:                                                                            |
-|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
-|        ID   ID                                                             Usage      |
-|=======================================================================================|
-|  No running processes found                                                           |
-+---------------------------------------------------------------------------------------+
-2024-04-16 23:04:23,907 INFO Writing results to panguweather.grib.
-2024-04-16 23:04:23,907 INFO Loading pressure fields from CDS
-2024-04-16 23:04:24,567 INFO Welcome to the CDS
-2024-04-16 23:04:24,567 INFO Welcome to the CDS
-2024-04-16 23:04:24,568 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/reanalysis-era5-pressure-levels
-2024-04-16 23:04:24,568 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/reanalysis-era5-pressure-levels
-2024-04-16 23:04:24,738 INFO Request is completed
-2024-04-16 23:04:24,738 INFO Request is completed
-2024-04-16 23:04:24,738 INFO Downloading https://download-0001-clone.copernicus-climate.eu/cache-compute-0001/cache/data1/adaptor.mars.internal-1713275361.7771173-28538-4-c9cf6c27-1a7b-4754-8916-04a732ff84ff.grib to /tmp/42054362/climetlab-alecler1/cds-retriever-74c70b9e06967fbeb4e72bae017bb660ce254b3d4fef7f9fa57974106a7b8b8c.cache.tmp (128.7M)
-2024-04-16 23:04:24,738 INFO Downloading https://download-0001-clone.copernicus-climate.eu/cache-compute-0001/cache/data1/adaptor.mars.internal-1713275361.7771173-28538-4-c9cf6c27-1a7b-4754-8916-04a732ff84ff.grib to /tmp/42054362/climetlab-alecler1/cds-retriever-74c70b9e06967fbeb4e72bae017bb660ce254b3d4fef7f9fa57974106a7b8b8c.cache.tmp (128.7M)
-  0%|          | 0.00/129M [00:00<?, ?B/s]  1%|▏         | 1.64M/129M [00:00<00:07, 17.2MB/s]  8%|▊         | 10.3M/129M [00:00<00:02, 60.5MB/s] 14%|█▎        | 17.4M/129M [00:00<00:01, 63.5MB/s] 18%|█▊        | 23.5M/129M [00:00<00:01, 62.3MB/s] 23%|██▎       | 29.4M/129M [00:00<00:02, 51.8MB/s] 27%|██▋       | 34.5M/129M [00:00<00:02, 46.9MB/s] 30%|███       | 39.2M/129M [00:00<00:02, 39.8MB/s] 34%|███▎      | 43.2M/129M [00:01<00:02, 35.5MB/s] 36%|███▋      | 46.8M/129M [00:01<00:02, 34.2MB/s] 39%|███▉      | 50.1M/129M [00:01<00:02, 33.2MB/s] 41%|████▏     | 53.4M/129M [00:01<00:02, 33.0MB/s] 44%|████▍     | 56.6M/129M [00:01<00:02, 31.0MB/s] 46%|████▋     | 59.5M/129M [00:01<00:02, 28.4MB/s] 48%|████▊     | 62.3M/129M [00:01<00:02, 26.5MB/s] 50%|█████     | 64.8M/129M [00:01<00:02, 25.4MB/s] 52%|█████▏    | 67.3M/129M [00:02<00:02, 24.4MB/s] 54%|█████▍    | 69.6M/129M [00:02<00:02, 23.6MB/s] 56%|█████▌    | 71.9M/129M [00:02<00:02, 23.4MB/s] 58%|█████▊    | 74.1M/129M [00:02<00:02, 23.2MB/s] 59%|█████▉    | 76.3M/129M [00:02<00:02, 23.0MB/s] 61%|██████    | 78.5M/129M [00:02<00:02, 22.9MB/s] 63%|██████▎   | 80.7M/129M [00:02<00:02, 21.0MB/s] 64%|██████▍   | 82.7M/129M [00:02<00:02, 20.2MB/s] 66%|██████▌   | 84.6M/129M [00:02<00:02, 19.4MB/s] 67%|██████▋   | 86.5M/129M [00:03<00:02, 19.0MB/s] 69%|██████▊   | 88.3M/129M [00:03<00:02, 18.4MB/s] 70%|██████▉   | 90.1M/129M [00:03<00:02, 18.3MB/s] 71%|███████▏  | 91.9M/129M [00:03<00:02, 18.6MB/s] 73%|███████▎  | 93.7M/129M [00:03<00:01, 18.5MB/s] 74%|███████▍  | 95.5M/129M [00:03<00:02, 16.9MB/s] 75%|███████▌  | 97.1M/129M [00:03<00:02, 15.8MB/s] 77%|███████▋  | 98.7M/129M [00:03<00:02, 15.7MB/s] 78%|███████▊  | 100M/129M [00:03<00:01, 15.7MB/s]  79%|███████▉  | 102M/129M [00:03<00:01, 15.4MB/s] 80%|████████  | 103M/129M [00:04<00:01, 15.4MB/s] 81%|████████▏ | 105M/129M [00:04<00:01, 15.5MB/s] 83%|████████▎ | 106M/129M [00:04<00:01, 15.5MB/s] 84%|████████▎ | 108M/129M [00:04<00:01, 15.8MB/s] 85%|████████▌ | 110M/129M [00:04<00:01, 16.4MB/s] 86%|████████▋ | 111M/129M [00:04<00:01, 16.8MB/s] 88%|████████▊ | 113M/129M [00:04<00:00, 17.2MB/s] 89%|████████▉ | 115M/129M [00:04<00:00, 17.4MB/s] 90%|█████████ | 116M/129M [00:04<00:00, 17.5MB/s] 92%|█████████▏| 118M/129M [00:05<00:00, 17.6MB/s] 93%|█████████▎| 120M/129M [00:05<00:00, 17.7MB/s] 94%|█████████▍| 122M/129M [00:05<00:00, 16.9MB/s] 96%|█████████▌| 123M/129M [00:05<00:00, 15.5MB/s] 97%|█████████▋| 125M/129M [00:05<00:00, 15.4MB/s] 98%|█████████▊| 126M/129M [00:05<00:00, 14.2MB/s] 99%|█████████▉| 128M/129M [00:05<00:00, 12.8MB/s]                                                  2024-04-16 23:04:30,764 INFO Download rate 21.4M/s
-2024-04-16 23:04:30,764 INFO Download rate 21.4M/s
-2024-04-16 23:04:31,260 INFO Loading surface fields from CDS
-2024-04-16 23:04:31,278 INFO Welcome to the CDS
-2024-04-16 23:04:31,278 INFO Welcome to the CDS
-2024-04-16 23:04:31,278 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/reanalysis-era5-single-levels
-2024-04-16 23:04:31,278 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/reanalysis-era5-single-levels
-2024-04-16 23:04:31,555 INFO Request is completed
-2024-04-16 23:04:31,555 INFO Request is completed
-2024-04-16 23:04:31,555 INFO Downloading https://download-0009-clone.copernicus-climate.eu/cache-compute-0009/cache/data7/adaptor.mars.internal-1713275378.7423332-10396-7-9b35a32b-8cf1-4306-a03b-6c0875c2b650.grib to /tmp/42054362/climetlab-alecler1/cds-retriever-256692528403245296c074fd43726b511a3034828eff062ff5f0d5ad49b3ce2a.cache.tmp (7.9M)
-2024-04-16 23:04:31,555 INFO Downloading https://download-0009-clone.copernicus-climate.eu/cache-compute-0009/cache/data7/adaptor.mars.internal-1713275378.7423332-10396-7-9b35a32b-8cf1-4306-a03b-6c0875c2b650.grib to /tmp/42054362/climetlab-alecler1/cds-retriever-256692528403245296c074fd43726b511a3034828eff062ff5f0d5ad49b3ce2a.cache.tmp (7.9M)
-  0%|          | 0.00/7.92M [00:00<?, ?B/s] 10%|▉         | 790k/7.92M [00:00<00:00, 7.78MB/s] 41%|████      | 3.24M/7.92M [00:00<00:00, 18.2MB/s] 63%|██████▎   | 4.98M/7.92M [00:00<00:00, 10.2MB/s] 79%|███████▊  | 6.22M/7.92M [00:00<00:00, 8.83MB/s] 91%|█████████ | 7.23M/7.92M [00:00<00:00, 8.12MB/s]                                                    2024-04-16 23:04:32,582 INFO Download rate 7.7M/s
-2024-04-16 23:04:32,582 INFO Download rate 7.7M/s
-2024-04-16 23:04:33,674 INFO ONNXRuntime providers: ['CUDAExecutionProvider', 'CPUExecutionProvider']
-2024-04-16 23:04:33,674 INFO Using device 'CPU'. The speed of inference depends greatly on the device.
-/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/alpth310/lib/python3.10/site-packages/onnxruntime/capi/onnxruntime_inference_collection.py:69: UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
-  warnings.warn(
-2024-04-16 23:04:40,610 INFO Loading ./panguweather/pangu_weather_24.onnx: 7 seconds.
-2024-04-16 23:04:47,109 INFO Loading ./panguweather/pangu_weather_6.onnx: 6 seconds.
-2024-04-16 23:04:47,109 INFO Model initialisation: 23 seconds
-2024-04-16 23:04:47,109 INFO Starting inference for 2 steps (12h).
-2024-04-16 23:07:18,788 INFO Done 1 out of 2 in 2 minutes 31 seconds (6h), ETA: 5 minutes 3 seconds.
-2024-04-16 23:09:50,120 INFO Done 2 out of 2 in 2 minutes 31 seconds (12h), ETA: 2 minutes 31 seconds.
-2024-04-16 23:09:50,120 INFO Elapsed: 5 minutes 3 seconds.
-2024-04-16 23:09:50,120 INFO Average: 2 minutes 31 seconds per step.
-2024-04-16 23:09:50,174 INFO Total time: 5 minutes 26 seconds.

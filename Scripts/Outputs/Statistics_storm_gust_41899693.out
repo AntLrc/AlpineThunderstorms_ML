@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/repos/Scripts/runner.py", line 19, in <module>
-    function()
-  File "/work/FAC/FGSE/IDYST/tbeucler/downscaling/alecler1/repos/Storm_tracks/STtoolbox.py", line 190, in needed_times
-    res1 = np.concatenate((res1, res1 - dtimes))
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-ValueError: zero-dimensional arrays cannot be concatenated

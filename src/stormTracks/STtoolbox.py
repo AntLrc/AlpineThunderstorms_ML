@@ -151,17 +151,17 @@ def filter(storms, **kwargs):
     **kwargs : dict
         Keyword arguments specifying the criteria to filter the storms.
         The valid keyword arguments are:
-        - start_date : str
+        - mindate : str
             The minimum date of the storms to keep.
-        - end_date : str
+        - maxdate : str
             The maximum date of the storms to keep.
-        - min_lon : float
+        - minlon : float
             The minimum longitude of the storms to keep.
-        - max_lon : float
+        - maxlon : float
             The maximum longitude of the storms to keep.
-        - min_lat : float
+        - minlat : float
             The minimum latitude of the storms to keep.
-        - max_lat : float
+        - maxlat : float
             The maximum latitude of the storms to keep.
         - agg : bool
             Whether to aggregate the storms before returning.
@@ -180,17 +180,17 @@ def filter(storms, **kwargs):
     
     # Filter storms based on the specified criteria
     for key, value in kwargs.items():
-        if key == "start_date":
+        if key == "mindate":
             storms = storms.filter(lambda x: x["time"].dt.date.min() >= pd.to_datetime(value).date()).groupby("ID")
-        elif key == "end_date":
+        elif key == "maxdate":
             storms = storms.filter(lambda x: x["time"].dt.date.max() < pd.to_datetime(value).date()).groupby("ID")
-        elif key == "min_lon":
+        elif key == "minlon":
             storms = storms.filter(lambda x: x["longitude"].min() >= value).groupby("ID")
-        elif key == "max_lon":
+        elif key == "maxlon":
             storms = storms.filter(lambda x: x["longitude"].max() < value).groupby("ID")
-        elif key == "min_lat":
+        elif key == "minlat":
             storms = storms.filter(lambda x: x["latitude"].min() >= value).groupby("ID")
-        elif key == "max_lat":
+        elif key == "maxlat":
             storms = storms.filter(lambda x: x["latitude"].max() < value).groupby("ID")
         elif key == "storm_type":
             if value == "RS":
@@ -208,7 +208,8 @@ def filter(storms, **kwargs):
             else:
                 raise ValueError("Invalid storm type.")
         else:
-            raise ValueError("Invalid keyword argument.")
+            if key != "agg":
+                raise ValueError("Invalid keyword argument.")
     if kwargs.get("agg", False):
         storms = storms.filter(lambda x: True)
     return storms
@@ -391,3 +392,78 @@ def neededTimes(storms, lead_times, **kwargs):
     
     return res
 
+def nearestStorm(storms, stormsDateId, longitude, latitude, datetime, **kwargs):
+    """
+    Find the nearest storm to (a) given point(s) at a given time.
+    
+    Parameters
+    ----------
+    storms : pandas.core.groupby.DataFrameGroupBy or pandas.core.frame.DataFrame or str
+        DataFrameGroupBy object containing storm data, or a DataFrame or a path to a CSV or pickle file.
+    stormsDateId : pandas.core.frame.DataFrame or str
+        DataFrame containing the dateID of the storms, or a path to a CSV or pickle file.
+    longitude : np.ndarray
+        The longitude of the point(s) to find the nearest storm to.
+    latitude : np.ndarray
+        The latitude of the point(s) to find the nearest storm to.
+    datetime : pandas._libs.tslibs.timestamps.Timestamp
+        The time at which to find the nearest storm.
+    **kwargs : dict
+        Keyword arguments specifying the format of the file.
+        The valid keyword arguments are:
+        - coord : str
+            The CRS of the input coordinates.
+        - coords : tuple
+            The names of the columns containing the x and y coordinates.
+    
+    Returns
+    -------
+    str
+        The ID of the nearest storm.
+    np.ndarray
+        The distance to the nearest storm.
+    """
+    
+    if isinstance(storms, str):
+        storms = loadStorms(storms, **kwargs)
+        
+    if isinstance(storms, pd.DataFrame):
+        # if storms is a DataFrame, convert it to a DataFrameGroupBy object
+        storms = storms.groupby("ID")
+        
+    if isinstance(stormsDateId, str):
+        stormsDateId = loadStorms(stormsDateId, format = "pkl")
+    
+    from_crs = kwargs.get("coord", "WGS84")
+    
+    if from_crs != "LV03" and from_crs != "EPSG:21781":
+        transformer = pyproj.Transformer.from_crs(from_crs, "EPSG:21781", always_xy=True)
+    else:
+        transformer = lambda x:x
+    
+    try:
+        IDs = stormsDateId.loc[datetime]
+    except:
+        IDs = []
+    dist, idm = np.ones(len(longitude))*np.inf, np.empty(len(longitude), dtype = object)
+    xref, yref = transformer.transform(longitude, latitude)
+    
+    if isinstance(IDs, str):
+        IDs = [IDs]
+    
+    for ID in IDs:
+        storm = storms.get_group(ID)
+        storm = storm[(storm["time"] >= datetime-pd.DateOffset(hours = 1)) & (storm["time"] <= datetime)]
+        x_coord,y_coord = kwargs.get("coords", ("longitude", "latitude"))
+        
+        for x,y,a in zip(storm[x_coord], storm[y_coord], storm["A"]):
+            x,y = transformer.transform(x,y)
+            dist_temp = ((x-xref)**2 + (y-yref)**2)/a
+            
+            idm = np.where(np.greater(dist, dist_temp), ID, idm)
+            dist = np.minimum(dist,dist_temp)
+            
+    return idm, np.sqrt(dist)/1000 #the area is in km**2
+    
+        
+        

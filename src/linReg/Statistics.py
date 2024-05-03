@@ -42,10 +42,6 @@ def loadData(**kwargs):
                 The minimum month to load data from.
             maxmonth : int
                 The maximum month to load data from.
-            stations : list
-                A list of stations to load data from.
-            lead_times : list
-                The lead times to load data for.
             stormFile : str
                 The file to load storm data from.
             stormDateIDFile : str
@@ -62,23 +58,23 @@ def loadData(**kwargs):
     """
     fromFile = kwargs.get("fromFile", None)
     if fromFile:
-        print(f"Loading data from {fromFile}")
+        print(f"Loading data from {fromFile}", flush = True)
         result = xr.open_dataset(fromFile)
     else:
         dataVars = kwargs.get("dataVars", "all")
         dirnameStations = kwargs.get("dirnameStations")
         dirnamePW = kwargs.get("dirnamePW")
-        if dataVars != "all":
+        if dataVars != "all" and dataVars != ["all"]:
             dataVarsStations = list(set(dataVars) & set(["all", "precip", "wind gust"]))
             dataVarsPW = list(set(dataVars) & set(["all", "t2m", "msl", "u10", "v10"]))
         else:
             dataVarsStations = "all"
             dataVarsPW = "all"
-        print(f"Loading data from {dirnameStations} and {dirnamePW}")
+        print(f"Loading data from {dirnameStations} and {dirnamePW}", flush=True)
         dsPW = pwtb.loadData(dataVarsPW, dirnamePW, **kwargs)
         dsSMN = smntb.loadData(dataVarsStations, dirnameStations, **kwargs)
         
-        print("Interpolating data")
+        print("Interpolating data", flush=True)
         interpolation = [None]*len(dsPW.lead_time.values)
         for i in range(len(dsPW.lead_time.values)):
             interpolation[i] = dsPW.sel(time = dsSMN.time, lead_time = dsPW.lead_time.values[i]).interp(lon = dsSMN.longitude.where(dsSMN.station == dsSMN.station), lat = dsSMN.latitude.where(dsSMN.station == dsSMN.station))
@@ -95,7 +91,7 @@ def loadData(**kwargs):
         mindate = pd.Timestamp(f"{minyear}-{minmonth}-01 00:00:00")
         maxdate = pd.Timestamp(f"{maxyear}-{maxmonth}-01 00:00:00") + pd.DateOffset(months=1) - pd.DateOffset(hours=1)
         
-        print("Loading storm data")
+        print("Loading storm data", flush = True)
         storms = sttb.loadStorms(kwargs.get("stormFile"))
         storms["time"] = storms["time"].dt.tz_localize(None)
         
@@ -112,9 +108,9 @@ def loadData(**kwargs):
         nearest_storm = np.array([[""]*len(stations)]*len(times), dtype=object)
         distance = np.array([[np.inf]*len(stations)]*len(times))
 
-        print("Finding nearest storms")
+        print("Finding nearest storms", flush = True)
         for i in range(len(times)):
-            print(f"{i/len(times)*100:.2f} %", end='\r')
+            print(f"{i/len(times)*100:.2f} %", end='\r', flush = True)
             lon,lat = result.sel(time=times[i]).longitude.values, result.sel(time=times[i]).latitude.values
             ids, dist = sttb.nearestStorm(storms, stormsDateID, lon,lat,times[i], **kwargs)
             nearest_storm[i] = ids
@@ -123,6 +119,16 @@ def loadData(**kwargs):
         result["nearest_storm"] = xr.DataArray(nearest_storm, coords=[result.time, result.station], dims=["time", "station"])
         result["distance"] = xr.DataArray(distance, coords=[result.time, result.station], dims=["time", "station"])
         
+    
+    if "latitude" in result.coords and "lat" in result.coords:
+        result = result.drop_vars("lat")
+    if "longitude" in result.coords and "lon" in result.coords:
+        result = result.drop_vars("lon")
+    
+    if "time" in result.coords["latitude"].dims:
+        result["latitude"] = result["latitude"].mean(dim = "time")
+    if "time" in result.coords["longitude"].dims:
+        result["longitude"] = result["longitude"].mean(dim = "time")
     
     return result
 
@@ -134,11 +140,16 @@ def saveData(data, toFile, **kwargs):
     ----------
     data : xarray.Dataset
         The data to save.
-    toFile : str
-        The file to save the data to.
     **kwargs : dict
         Additional keyword arguments to be passed to the to_netcdf method.
+        dirpath : str
+            The directory to save the file to.
     """
+    dirpath = kwargs.pop("dirpath", None)
+    if dirpath is not None:
+        if not os.path.exists(dirpath):
+            os.makedirs(dirpath)
+        toFile = os.path.join(dirpath, toFile.split("/")[-1])
     data.to_netcdf(toFile, **kwargs)
     return
 

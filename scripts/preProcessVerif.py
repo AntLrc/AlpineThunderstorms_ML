@@ -25,8 +25,9 @@ def main():
 
     parser.add_argument("--dirpath", "-d",
                         type=str,
+                        nargs="+",
                         required=True,
-                        help="Path to the directory to verify."
+                        help="Path to the directory to verify. If step is 'all', dirpath should be provided in the order postprocessing, clipping."
                         )
 
     args = parser.parse_args()
@@ -36,7 +37,7 @@ def main():
     step = args.step
     dirpath = args.dirpath
 
-    if not (step in ["download", "postprocessing", "clipexport"]):
+    if not (step in ["download", "postprocessing", "clipexport", "all"]):
         raise ValueError("Invalid step, must be in 'download', 'postprocessing' or 'clipexport'.")
 
     if step == "download":
@@ -89,6 +90,36 @@ def main():
             
         if wholemonth:
             print(f"\n\tWhole month of {year}-{month} is missing.")
+    
+    if step == "all":
+        finished = True
+        folderpath = [None]*2
+        for i in range(2):
+            folderpath[i] = os.path.join(dirpath[i], year, month)
+            
+        # Postprocessing
+        for day in range(1, pd.to_datetime(f"{year}-{month}").days_in_month + 1):
+            day = f"{day:02}"
+            for hour in range(24):
+                hour = f"{hour:02}"
+                if not os.path.exists(os.path.join(folderpath[1], f"pangu_weather_{year}-{month}-{day}T{hour}_clipped.nc")):
+                    if not os.path.exists(os.path.join(folderpath[0], f"pangu_weather_{year}-{month}-{day}T{hour}_LT.nc")):
+                        print(f"\tMissing postprocessed data for {year}-{month}-{day}T{hour}_LT.")
+                        finished = False
+                        if not os.path.exists(os.path.join(folderpath[0], f"pangu_weather_{year}-{month}-{day}T{hour}_ST.nc")):
+                            print(f"\tMissing postprocessed data for {year}-{month}-{day}T{hour}_ST.")
+                            finished = False
+                    else:
+                        if not os.path.exists(os.path.join(folderpath[0], f"pangu_weather_{year}-{month}-{day}T{hour}_ST.nc")):
+                            print(f"\tMissing postprocessed data for {year}-{month}-{day}T{hour}_ST.")
+                            finished = False
+                        else:
+                            #Clip export
+                            print(f"\t\tMissing clipped data for {year}-{month}-{day}T{hour} clipped.")
+                            finished = False
+        
+        if finished:
+            print(f"Postprocessing, clipping and exporting for {year}-{month} is complete.")
 
 if __name__ == '__main__':
     main()

@@ -4,5 +4,6 @@ import geopandas as gpd
 import xarray as xr
 import matplotlib.pyplot as plt
 import seaborn as sns
-import SMTtoolbox as smntb
+import SMNtoolbox as smntb
+
 

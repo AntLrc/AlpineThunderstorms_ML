@@ -453,7 +453,7 @@ def nearestStorm(storms, stormsDateId, longitude, latitude, datetime, **kwargs):
     
     for ID in IDs:
         storm = storms.get_group(ID)
-        storm = storm[(storm["time"] >= datetime-pd.DateOffset(hours = 1)) & (storm["time"] <= datetime)]
+        storm = storm[(storm["time"] > datetime-pd.DateOffset(hours = 1)) & (storm["time"] <= datetime)] # Stations data are aggregated every hour, with the time being the end of the hour
         x_coord,y_coord = kwargs.get("coords", ("longitude", "latitude"))
         
         for x,y,a in zip(storm[x_coord], storm[y_coord], storm["A"]):
@@ -462,8 +462,20 @@ def nearestStorm(storms, stormsDateId, longitude, latitude, datetime, **kwargs):
             
             idm = np.where(np.greater(dist, dist_temp), ID, idm)
             dist = np.minimum(dist,dist_temp)
-            
+    
+    dist[dist == np.inf] = np.nan
+    
     return idm, np.sqrt(dist)/1000 #the area is in km**2
     
+def DateID(storms, toFile, **kwargs):
+    
+    if isinstance(storms, str):
+        storms = loadStorms(storms, **kwargs)
         
+    if isinstance(storms, pd.core.groupby.DataFrameGroupBy):
+        storms = storms.filter(lambda x : True)
         
+    result = pd.Series(data = storms["ID"].values, index = (storms["time"]+pd.DateOffset(minutes = 55)).dt.floor('h').values, dtype = 'object').sort_index().drop_duplicates()
+    return result
+    
+    
